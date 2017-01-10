@@ -47,4 +47,22 @@ function AMQPClient(args, cb) {
   });
 }
 
+// Sends a message to AMQP
+AMQPClient.prototype.emit = function (type, data, cb) {
+  var self = this;
+
+  // Generate message to be published
+  var msg = JSON.stringify({
+    type: type,
+    payload: data
+  });
+
+  // Publish the message
+  self.ch.publish(self.options.exchange, '', new Buffer(msg));
+
+  if (cb) {
+    return cb();
+  }
+};
+
 module.exports = AMQPClient;
