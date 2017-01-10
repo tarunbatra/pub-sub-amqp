@@ -17,7 +17,10 @@ function AMQPClient(args, cb) {
   amqp.connect(options.uri, function (err, conn) {
 
     if (err) {
-      return cb(err);
+      if (cb) {
+        return cb(err);
+      }
+      throw err;
     }
 
     self.conn = conn;
@@ -26,7 +29,10 @@ function AMQPClient(args, cb) {
     conn.createChannel(function (error, ch) {
 
       if (error) {
-        return cb(error);
+        if (cb) {
+          return cb(error);
+        }
+        throw error;
       }
 
       self.ch = ch;
@@ -51,6 +57,15 @@ function AMQPClient(args, cb) {
 AMQPClient.prototype.emit = function (type, data, cb) {
   var self = this;
 
+  // If channnel not initialized, throw error
+  if (!self.ch) {
+    var error = new Error('Not connected to an AMQP server');
+    if (cb) {
+      return cb(error);
+    }
+    throw error;
+  }
+
   // Generate message to be published
   var msg = JSON.stringify({
     type: type,
@@ -67,6 +82,15 @@ AMQPClient.prototype.emit = function (type, data, cb) {
 
 AMQPClient.prototype.on = function (type, cb) {
   var self = this;
+
+  // If channnel not initialized, throw error
+  if (!self.ch) {
+    var error = new Error('Not connected to an AMQP server');
+    if (cb) {
+      return cb(error);
+    }
+    throw error;
+  }
 
   // Listen for messages
   self.ch.consume(self.options.queue, function (msg) {
