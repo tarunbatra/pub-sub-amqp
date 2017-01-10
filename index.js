@@ -65,4 +65,28 @@ AMQPClient.prototype.emit = function (type, data, cb) {
   }
 };
 
+AMQPClient.prototype.on = function (type, cb) {
+  var self = this;
+
+  // Listen for messages
+  self.ch.consume(self.options.queue, function (msg) {
+
+    // Parse the message
+    var data = JSON.parse(msg.content.toString());
+
+    // Acknowleedge the message
+    self.ch.ack(msg);
+
+    // Ignore if the type doesn't match
+    if (data.type !== type) {
+      return;
+    }
+
+    // Return the message
+    if (cb) {
+      return cb(null, msg.payload);
+    }
+  });
+};
+
 module.exports = AMQPClient;
