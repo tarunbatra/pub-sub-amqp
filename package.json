@@ -1,0 +1,32 @@
+{
+  "name": "pub-sub-amqp",
+  "version": "0.0.1",
+  "description": "A simple pub sub module using AMQP",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ./ --ext .js",
+    "test": "npm run lint"
+  },
+  "keywords": [
+    "amqp",
+    "pub/sub",
+    "publish",
+    "rabbitmq"
+  ],
+  "author": "Tarun Batra <tarun.batra00@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tarunbatra/pub-sub-amqp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tarunbatra/pub-sub-amqp/issues"
+  },
+  "homepage": "https://github.com/tarunbatra/pub-sub-amqp#readme",
+  "dependencies": {
+    "amqplib": "^0.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^1.10.x"
+  }
+}
