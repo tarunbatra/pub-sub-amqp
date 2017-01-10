@@ -3,11 +3,11 @@ var amqp = require('amqplib/callback_api');
 function AMQPClient(args, cb) {
 
   var options = {
-    uri: args.uri,
-    exchange: args.exchange || 'exchange',
-    exchangeType: args.exchangeType || 'fanout',
-    queue: args.queue || process.pid,
-    durable: args.durable || false
+    uri: args.uri,                                // URI of the AMQP server to connect
+    exchange: args.exchange || 'exchange',        // Exchange name. Defaults to 'exchange'
+    exchangeType: args.exchangeType || 'fanout',  // Exchange type. Defaults to 'fanout'
+    queue: args.queue || process.pid,             // Queue name. Defaults to random
+    durable: args.durable || false                // Queue durability. Defaults to false
   };
 
   this.options = options;
