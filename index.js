@@ -13,28 +13,31 @@ function AMQPClient(args, cb) {
   this.options = options;
   var self = this;
 
-  amqp.connect(options.uri, function(err, conn) {
+  // Connect to AMQP
+  amqp.connect(options.uri, function (err, conn) {
+
     if (err) {
-      if (cb) {
-        return cb(err);
-      }
-      throw err;
+      return cb(err);
     }
+
     self.conn = conn;
 
-    conn.createChannel(function(error, ch) {
+    // Create a channel
+    conn.createChannel(function (error, ch) {
+
       if (error) {
-        if (cb) {
-          return cb(error);
-        }
-        throw error;
+        return cb(error);
       }
+
       self.ch = ch;
 
+      // Create an exchange if it doesn't exists
       ch.assertExchange(options.exchange, options.exchangeType);
 
+      // Create a queue if it doesn't exists
       ch.assertQueue(options.queue, { durable: options.durable });
 
+      // Bind the queue qith the exchange
       ch.bindQueue(options.queue, options.exchange);
 
       if (cb) {
@@ -43,55 +46,5 @@ function AMQPClient(args, cb) {
     });
   });
 }
-
-AMQPClient.prototype.emit = function (type, data, cb) {
-  var self =this;
-
-  if (!self.ch) {
-    var error = new Error('Not connected to an AMQP server');
-    if (cb) {
-      return cb(error);
-    }
-    throw error;
-  }
-
-  var msg = JSON.stringify({
-    type: type,
-    payload: data
-  });
-
-  self.ch.publish(self.options.exchange, '', new Buffer(msg));
-
-  if (cb) {
-    return cb();
-  }
-};
-
-AMQPClient.prototype.on = function (type, cb) {
-  var self = this;
-
-  if (!self.ch) {
-    var error = new Error('Not connected to an AMQP server');
-    if (cb) {
-      return cb(error);
-    }
-    throw error;
-  }
-
-  self.ch.consume(self.options.queue, function (msg) {
-
-    var data = JSON.parse(msg.content.toString());
-
-    self.ch.ack(msg);
-
-    if (data.type !== type) {
-      return;
-    }
-
-    if (cb) {
-      return cb(null, msg.payload);
-    }
-  });
-};
 
 module.exports = AMQPClient;
