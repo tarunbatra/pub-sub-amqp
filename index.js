@@ -17,7 +17,7 @@ function AMQPClient(options, cb) {
     uri: options.uri,                                // URI of the AMQP server to connect
     exchange: options.exchange || 'exchange',        // Exchange name. Defaults to 'exchange'
     exchangeType: options.exchangeType || 'fanout',  // Exchange type. Defaults to 'fanout'
-    queue: options.queue || process.pid,             // Queue name. Defaults to random
+    queue: options.queue || String(process.pid),     // Queue name. Defaults to random
     durable: options.durable || false                // Queue durability. Defaults to false
   };
 
