@@ -128,7 +128,7 @@ AMQPClient.prototype.on = function (type, cb) {
 
     // Return the message
     if (cb) {
-      return cb(null, msg.payload);
+      return cb(null, data.payload);
     }
   });
 };
