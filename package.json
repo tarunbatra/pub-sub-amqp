@@ -11,7 +11,8 @@
     "amqp",
     "pub/sub",
     "publish",
-    "rabbitmq"
+    "rabbitmq",
+    "event"
   ],
   "author": "Tarun Batra <tarun.batra00@gmail.com>",
   "license": "MIT",

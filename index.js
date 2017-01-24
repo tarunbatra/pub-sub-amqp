@@ -1,20 +1,30 @@
 var amqp = require('amqplib/callback_api');
 
-function AMQPClient(args, cb) {
+/**
+ * A wrapper over AMQP, providing methods to publish and subscribe.
+ * @constructor
+ * @param {object} options - Options passed to the AMQP client
+ * @param {string} options.uri - URI of the AMQP server to connect
+ * @param {string} [options.exchange=exchange] - Exchange name
+ * @param {string} [options.exchangeType=fanout] - Exchange type
+ * @param {string} [options.queue=$pid] - Queue name
+ * @param {string} [options.durable=false] - Queue durability
+ * @param {function} [cb] - callback
+ */
+function AMQPClient(options, cb) {
 
-  var options = {
-    uri: args.uri,                                // URI of the AMQP server to connect
-    exchange: args.exchange || 'exchange',        // Exchange name. Defaults to 'exchange'
-    exchangeType: args.exchangeType || 'fanout',  // Exchange type. Defaults to 'fanout'
-    queue: args.queue || process.pid,             // Queue name. Defaults to random
-    durable: args.durable || false                // Queue durability. Defaults to false
+  this.options = {
+    uri: options.uri,                                // URI of the AMQP server to connect
+    exchange: options.exchange || 'exchange',        // Exchange name. Defaults to 'exchange'
+    exchangeType: options.exchangeType || 'fanout',  // Exchange type. Defaults to 'fanout'
+    queue: options.queue || process.pid,             // Queue name. Defaults to random
+    durable: options.durable || false                // Queue durability. Defaults to false
   };
 
-  this.options = options;
   var self = this;
 
   // Connect to AMQP
-  amqp.connect(options.uri, function (err, conn) {
+  amqp.connect(self.options.uri, function (err, conn) {
 
     if (err) {
       if (cb) {
@@ -38,13 +48,13 @@ function AMQPClient(args, cb) {
       self.ch = ch;
 
       // Create an exchange if it doesn't exists
-      ch.assertExchange(options.exchange, options.exchangeType);
+      ch.assertExchange(self.options.exchange, self.options.exchangeType);
 
       // Create a queue if it doesn't exists
-      ch.assertQueue(options.queue, { durable: options.durable });
+      ch.assertQueue(self.options.queue, { durable: self.options.durable });
 
       // Bind the queue qith the exchange
-      ch.bindQueue(options.queue, options.exchange);
+      ch.bindQueue(self.options.queue, self.options.exchange);
 
       if (cb) {
         return cb();
@@ -53,7 +63,12 @@ function AMQPClient(args, cb) {
   });
 }
 
-// Sends a message to AMQP
+/**
+ * Publishes message to AMQP exchange
+ * @param {string} type - Type of the message
+ * @param {*} data - Data to be sent
+ * @param {function} [cb] - callback
+ */
 AMQPClient.prototype.emit = function (type, data, cb) {
   var self = this;
 
@@ -80,6 +95,11 @@ AMQPClient.prototype.emit = function (type, data, cb) {
   }
 };
 
+/**
+ * Listens for message of a type
+ * @param {string} type - Type of the message
+ * @param {function} [cb] - callback
+ */
 AMQPClient.prototype.on = function (type, cb) {
   var self = this;
 
@@ -98,7 +118,7 @@ AMQPClient.prototype.on = function (type, cb) {
     // Parse the message
     var data = JSON.parse(msg.content.toString());
 
-    // Acknowleedge the message
+    // Acknowledge the message
     self.ch.ack(msg);
 
     // Ignore if the type doesn't match
