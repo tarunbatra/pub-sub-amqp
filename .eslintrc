@@ -1,40 +1,11 @@
 {
   "env": {
-    "es6": true,
     "browser": true,
     "node": true,
-    "meteor": true,
     "mocha": true
   },
 
   "plugins": [],
-
-  "ecmaFeatures": {
-    "arrowFunctions": true,
-    "binaryLiterals": true,
-    "blockBindings": true,
-    "classes": true,
-    "defaultParams": true,
-    "destructuring": true,
-    "experimentalObjectRestSpread": true,
-    "forOf": true,
-    "generators": true,
-    "globalReturn": true,
-    "jsx": true,
-    "modules": true,
-    "objectLiteralComputedProperties": true,
-    "objectLiteralDuplicateProperties": true,
-    "objectLiteralShorthandMethods": true,
-    "objectLiteralShorthandProperties": true,
-    "octalLiterals": true,
-    "regexUFlag": true,
-    "regexYFlag": true,
-    "restParams": true,
-    "spread": true,
-    "superInFunctions": true,
-    "templateStrings": true,
-    "unicodeCodePointEscapes": true
-  },
 
   "rules": {
     "array-bracket-spacing": [2, "always"],
