@@ -6,10 +6,10 @@ var amqp = require('amqplib/callback_api');
  * @param {object} options - Options passed to the AMQP client
  * @param {string} options.uri - URI of the AMQP server to connect
  * @param {string} [options.exchange=exchange] - Exchange name
- * @param {string} [options.exchangeType=fanout] - Exchange type
+ * @param {string} [options.exchangeType=topic] - Exchange type
  * @param {string} [options.queue=$pid] - Queue name
  * @param {string} [options.durable=false] - Queue durability
- * @param {function} [cb] - callback
+ * @param {function} [cb] - Callback
  */
 function AMQPClient(options, cb) {
 
@@ -64,7 +64,7 @@ function AMQPClient(options, cb) {
  * Publishes message to AMQP exchange
  * @param {string} type - Type of the message
  * @param {*} data - Data to be sent
- * @param {function} [cb] - callback
+ * @param {function} [cb] - Callback
  */
 AMQPClient.prototype.emit = function (type, data, cb) {
   var self = this;
@@ -92,7 +92,7 @@ AMQPClient.prototype.emit = function (type, data, cb) {
 /**
  * Listens for message of a type
  * @param {string} type - Type of the message
- * @param {function} [cb] - callback
+ * @param {messageReceivedCallback} cb - Callback
  */
 AMQPClient.prototype.on = function (type, cb) {
   var self = this;
@@ -130,3 +130,14 @@ AMQPClient.prototype.on = function (type, cb) {
 };
 
 module.exports = AMQPClient;
+
+
+/**
+ * Callback called when a subscribed message is received
+ * @callback messageReceivedCallback
+ * @param {object|null} error - Error
+ * @param {object} event - Message details
+ * @param {object} event.data - Message received
+ * @param {object} event.ack - Method to acknowledge the message
+ * @param {object} event.reject - Method to reject the message
+ */
