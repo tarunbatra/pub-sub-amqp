@@ -11,9 +11,9 @@ var constants = require('./constants.json');
  * @param {string} [options.exchangeType=topic] - Exchange type
  * @param {string} [options.queue=$pid] - Queue name
  * @param {string} [options.durable=false] - Queue durability
- * @param {function} [cb] - Callback
+ * @param {function} [callback] - Callback
  */
-function AMQPClient(options, cb) {
+function AMQPClient(options, callback) {
 
   this.options = {
     uri: options.uri,                                // URI of the AMQP server to connect
@@ -28,43 +28,42 @@ function AMQPClient(options, cb) {
   debug(constants.CONNECTING);
 
   // Connect to AMQP
-  amqp.connect(self.options.uri, function (err, conn) {
+  amqp.connect(self.options.uri, function (err, connection) {
 
     if (err) {
       debug(err);
-      if (cb) {
-        return cb(err);
+      if (callback) {
+        return callback(err);
       }
       throw err;
     }
 
     debug(constants.CONNECTED);
 
-    self.conn = conn;
-
     // Create a channel
-    conn.createChannel(function (error, ch) {
+    connection.createChannel(function (error, channel) {
 
       if (error) {
         debug(error);
-        if (cb) {
-          return cb(error);
+        if (callback) {
+          return callback(error);
         }
         throw error;
       }
 
-      self.ch = ch;
+      // SAves reference of channel for future use
+      self.channel = channel;
 
       // Create an exchange if it doesn't exists
-      ch.assertExchange(self.options.exchange, self.options.exchangeType);
+      channel.assertExchange(self.options.exchange, self.options.exchangeType);
 
       // Create a queue if it doesn't exists
-      ch.assertQueue(self.options.queue, { durable: self.options.durable });
+      channel.assertQueue(self.options.queue, { durable: self.options.durable });
 
       debug(constants.INITIALIZED);
 
-      if (cb) {
-        return cb();
+      if (callback) {
+        return callback();
       }
     });
   });
@@ -74,17 +73,17 @@ function AMQPClient(options, cb) {
  * Publishes message to AMQP exchange
  * @param {string} type - Type of the message
  * @param {*} data - Data to be sent
- * @param {function} [cb] - Callback
+ * @param {function} [callback] - Callback
  */
-AMQPClient.prototype.emit = function (type, data, cb) {
+AMQPClient.prototype.emit = function (type, data, callback) {
   var self = this;
 
   // If channnel not initialized, throw error
-  if (!self.ch) {
+  if (!self.channel) {
     var error = new Error(constants.NOT_CONNECTED);
     debug(error);
-    if (cb) {
-      return cb(error);
+    if (callback) {
+      return callback(error);
     }
     throw error;
   }
@@ -93,40 +92,42 @@ AMQPClient.prototype.emit = function (type, data, cb) {
   var msg = JSON.stringify(data);
 
   // Publish the message
-  self.ch.publish(self.options.exchange, type, new Buffer(msg));
+  self.channel.publish(self.options.exchange, type, new Buffer(msg));
 
   debug('PUBLISHED: [%s] %o', type, data);
 
-  if (cb) {
-    return cb();
+  if (callback) {
+    return callback();
   }
 };
 
 /**
  * Listens for message of a type
  * @param {string} type - Type of the message
- * @param {messageReceivedCallback} cb - Callback
+ * @param {messageReceivedCallback} callback - Callback
  */
-AMQPClient.prototype.on = function (type, cb) {
+AMQPClient.prototype.on = function (type, callback) {
   var self = this;
 
-  // If channnel not initialized, throw error
-  if (!self.ch) {
-    var error = new Error(constants.NOT_CONNECTED);
-    debug(error);
-    if (cb) {
-      return cb(error);
+  // If channnel not initialized, return error
+  if (!self.channel) {
+    var notConnectedError = new Error(constants.NOT_CONNECTED);
+    debug(notConnectedError);
+    if (callback) {
+      return callback(notConnectedError);
     }
-    throw error;
+
+    // If no callback, throw the error
+    throw notConnectedError;
   }
 
   // Bind the queue qith the exchange
-  self.ch.bindQueue(self.options.queue, self.options.exchange, type);
+  self.channel.bindQueue(self.options.queue, self.options.exchange, type);
 
   debug('LISTENING: %s', type);
 
   // Listen for messages
-  self.ch.consume(self.options.queue, function (msg) {
+  self.channel.consume(self.options.queue, function (msg) {
 
     var data;
 
@@ -136,10 +137,10 @@ AMQPClient.prototype.on = function (type, cb) {
     } catch (err) {
 
       // If message is not valid JSON, return error
-      var error = new Error(constants.CORRUPTED_MSG);
-      debug(error);
-      if (cb) {
-        return cb(error);
+      var corruptedMsgError = new Error(constants.CORRUPTED_MSG);
+      debug(corruptedMsgError);
+      if (callback) {
+        return callback(corruptedMsgError);
       }
     }
 
@@ -148,13 +149,13 @@ AMQPClient.prototype.on = function (type, cb) {
     // Construct the event object
     var event = {
       data: data,
-      ack: self.ch.ack,
-      reject: self.ch.reject
+      ack: self.channel.ack,
+      reject: self.channel.reject
     };
 
     // Return the message
-    if (cb) {
-      return cb(null, event);
+    if (callback) {
+      return callback(null, event);
     }
   });
 };
