@@ -106,23 +106,25 @@ AMQPClient.prototype.on = function (type, cb) {
     throw error;
   }
 
+  // Bind the queue qith the exchange
+  self.ch.bindQueue(self.options.queue, self.options.exchange, type);
+
   // Listen for messages
   self.ch.consume(self.options.queue, function (msg) {
 
     // Parse the message
     var data = JSON.parse(msg.content.toString());
 
-    // Acknowledge the message
-    self.ch.ack(msg);
-
-    // Ignore if the type doesn't match
-    if (data.type !== type) {
-      return;
-    }
+    // Construct the event object
+    var event = {
+      data: data,
+      ack: self.ch.ack,
+      reject: self.ch.reject
+    };
 
     // Return the message
     if (cb) {
-      return cb(null, data.payload);
+      return cb(null, event);
     }
   });
 };
