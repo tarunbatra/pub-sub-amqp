@@ -136,12 +136,9 @@ AMQPClient.prototype.on = function (type, callback) {
       data = JSON.parse(msg.content.toString());
     } catch (err) {
 
-      // If message is not valid JSON, return error
-      var corruptedMsgError = new Error(constants.CORRUPTED_MSG);
-      debug(corruptedMsgError);
-      if (callback) {
-        return callback(corruptedMsgError);
-      }
+      // If message is not valid JSON,
+      // return the message as it is
+      data = msg.content.toString();
     }
 
     debug('RECEVIED: [%s] %o', type, data);
@@ -153,7 +150,7 @@ AMQPClient.prototype.on = function (type, callback) {
       reject: self.channel.reject
     };
 
-    // Return the message
+    // Return the event
     if (callback) {
       return callback(null, event);
     }

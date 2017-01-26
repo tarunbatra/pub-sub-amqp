@@ -1,7 +1,6 @@
 {
   "CONNECTING": "Connecting to AMQP broker",
   "CONNECTED": "Connected to AMQP broker",
-  "CORRUPTED_MSG": "Message received is not a valid JSON string",
   "INITIALIZED": "AMQP client initialized",
   "MSG_PUBLISHED": "Message published",
   "MSG_RECEIVED": "Message received",
