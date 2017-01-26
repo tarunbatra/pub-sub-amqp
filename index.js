@@ -16,7 +16,7 @@ function AMQPClient(options, cb) {
   this.options = {
     uri: options.uri,                                // URI of the AMQP server to connect
     exchange: options.exchange || 'exchange',        // Exchange name. Defaults to 'exchange'
-    exchangeType: options.exchangeType || 'fanout',  // Exchange type. Defaults to 'fanout'
+    exchangeType: options.exchangeType || 'topic',   // Exchange type. Defaults to 'topic'
     queue: options.queue || String(process.pid),     // Queue name. Defaults to random
     durable: options.durable || false                // Queue durability. Defaults to false
   };
@@ -53,9 +53,6 @@ function AMQPClient(options, cb) {
       // Create a queue if it doesn't exists
       ch.assertQueue(self.options.queue, { durable: self.options.durable });
 
-      // Bind the queue qith the exchange
-      ch.bindQueue(self.options.queue, self.options.exchange);
-
       if (cb) {
         return cb();
       }
@@ -82,13 +79,10 @@ AMQPClient.prototype.emit = function (type, data, cb) {
   }
 
   // Generate message to be published
-  var msg = JSON.stringify({
-    type: type,
-    payload: data
-  });
+  var msg = JSON.stringify(data);
 
   // Publish the message
-  self.ch.publish(self.options.exchange, '', new Buffer(msg));
+  self.ch.publish(self.options.exchange, type, new Buffer(msg));
 
   if (cb) {
     return cb();
