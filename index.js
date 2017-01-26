@@ -128,8 +128,20 @@ AMQPClient.prototype.on = function (type, cb) {
   // Listen for messages
   self.ch.consume(self.options.queue, function (msg) {
 
-    // Parse the message
-    var data = JSON.parse(msg.content.toString());
+    var data;
+
+    try {
+      // Try to parse the message received
+      data = JSON.parse(msg.content.toString());
+    } catch (err) {
+
+      // If message is not valid JSON, return error
+      var error = new Error(constants.CORRUPTED_MSG);
+      debug(error);
+      if (cb) {
+        return cb(error);
+      }
+    }
 
     debug('RECEVIED: [%s] %o', type, data);
 
