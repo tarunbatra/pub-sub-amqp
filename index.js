@@ -1,4 +1,6 @@
 var amqp = require('amqplib/callback_api');
+var debug = require('debug')('pub-sub-amqp');
+var constants = require('./constants.json');
 
 /**
  * A wrapper over AMQP, providing methods to publish and subscribe.
@@ -23,15 +25,20 @@ function AMQPClient(options, cb) {
 
   var self = this;
 
+  debug(constants.CONNECTING);
+
   // Connect to AMQP
   amqp.connect(self.options.uri, function (err, conn) {
 
     if (err) {
+      debug(err);
       if (cb) {
         return cb(err);
       }
       throw err;
     }
+
+    debug(constants.CONNECTED);
 
     self.conn = conn;
 
@@ -39,6 +46,7 @@ function AMQPClient(options, cb) {
     conn.createChannel(function (error, ch) {
 
       if (error) {
+        debug(error);
         if (cb) {
           return cb(error);
         }
@@ -52,6 +60,8 @@ function AMQPClient(options, cb) {
 
       // Create a queue if it doesn't exists
       ch.assertQueue(self.options.queue, { durable: self.options.durable });
+
+      debug(constants.INITIALIZED);
 
       if (cb) {
         return cb();
@@ -71,7 +81,8 @@ AMQPClient.prototype.emit = function (type, data, cb) {
 
   // If channnel not initialized, throw error
   if (!self.ch) {
-    var error = new Error('Not connected to an AMQP server');
+    var error = new Error(constants.NOT_CONNECTED);
+    debug(error);
     if (cb) {
       return cb(error);
     }
@@ -83,6 +94,8 @@ AMQPClient.prototype.emit = function (type, data, cb) {
 
   // Publish the message
   self.ch.publish(self.options.exchange, type, new Buffer(msg));
+
+  debug('PUBLISHED: [%s] %o', type, data);
 
   if (cb) {
     return cb();
@@ -99,7 +112,8 @@ AMQPClient.prototype.on = function (type, cb) {
 
   // If channnel not initialized, throw error
   if (!self.ch) {
-    var error = new Error('Not connected to an AMQP server');
+    var error = new Error(constants.NOT_CONNECTED);
+    debug(error);
     if (cb) {
       return cb(error);
     }
@@ -109,11 +123,15 @@ AMQPClient.prototype.on = function (type, cb) {
   // Bind the queue qith the exchange
   self.ch.bindQueue(self.options.queue, self.options.exchange, type);
 
+  debug('LISTENING: %s', type);
+
   // Listen for messages
   self.ch.consume(self.options.queue, function (msg) {
 
     // Parse the message
     var data = JSON.parse(msg.content.toString());
+
+    debug('RECEVIED: [%s] %o', type, data);
 
     // Construct the event object
     var event = {

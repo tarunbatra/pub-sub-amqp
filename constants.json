@@ -1,0 +1,8 @@
+{
+  "CONNECTING": "Connecting to AMQP broker",
+  "CONNECTED": "Connected to AMQP broker",
+  "INITIALIZED": "AMQP client initialized",
+  "MSG_PUBLISHED": "Message published",
+  "MSG_RECEIVED": "Message received",
+  "NOT_CONNECTED": "Not connected to an AMQP broker"
+}

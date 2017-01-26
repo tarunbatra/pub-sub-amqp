@@ -25,7 +25,8 @@
   },
   "homepage": "https://github.com/tarunbatra/pub-sub-amqp#readme",
   "dependencies": {
-    "amqplib": "^0.5.1"
+    "amqplib": "^0.5.1",
+    "debug": "^2.6.0"
   },
   "devDependencies": {
     "eslint": "^1.10.x"
