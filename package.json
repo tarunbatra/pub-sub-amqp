@@ -2,11 +2,11 @@
   "name": "pub-sub-amqp",
   "version": "0.0.1",
   "description": "A simple pub sub module using AMQP",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "lint": "eslint index.js",
+    "lint": "eslint ./src/*.js",
     "test": "npm run lint",
-    "docs": "node_modules/.bin/jsdoc index.js -t ./node_modules/docdash -R README.md -d ./docs -r"
+    "docs": "node_modules/.bin/jsdoc ./src/*.js -t ./node_modules/docdash -R README.md -d ./docs -r"
   },
   "keywords": [
     "amqp",
