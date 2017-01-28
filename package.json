@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./ --ext .js",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "docs": "node_modules/.bin/jsdoc index.js -t ./node_modules/docdash -R README.md -d ./docs -r"
   },
   "keywords": [
     "amqp",
@@ -29,6 +30,8 @@
     "debug": "^2.6.0"
   },
   "devDependencies": {
-    "eslint": "^1.10.x"
+    "docdash": "^0.4.0",
+    "eslint": "^1.10.x",
+    "jsdoc": "^3.4.3"
   }
 }
