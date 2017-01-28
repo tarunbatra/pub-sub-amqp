@@ -4,7 +4,7 @@
   "description": "A simple pub sub module using AMQP",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint ./ --ext .js",
+    "lint": "eslint index.js",
     "test": "npm run lint",
     "docs": "node_modules/.bin/jsdoc index.js -t ./node_modules/docdash -R README.md -d ./docs -r"
   },

@@ -5,8 +5,9 @@ var constants = require('./constants.json');
 /**
  * A wrapper over AMQP, providing methods to publish and subscribe.
  * @constructor
+ * @author tbking <tarun.batra00@gmail.com>
  * @param {object} options - Options passed to the AMQP client
- * @param {string} options.uri - URI of the AMQP server to connect
+ * @param {string} options.uri - URI of the AMQP broker to connect
  * @param {string} [options.exchange=exchange] - Exchange name
  * @param {string} [options.exchangeType=topic] - Exchange type
  * @param {string} [options.queue=$pid] - Queue name
@@ -16,10 +17,10 @@ var constants = require('./constants.json');
 function AMQPClient(options, callback) {
 
   this.options = {
-    uri: options.uri,                                // URI of the AMQP server to connect
+    uri: options.uri,                                // URI of the AMQP broker to connect
     exchange: options.exchange || 'exchange',        // Exchange name. Defaults to 'exchange'
     exchangeType: options.exchangeType || 'topic',   // Exchange type. Defaults to 'topic'
-    queue: options.queue || String(process.pid),     // Queue name. Defaults to random
+    queue: options.queue || String(process.pid),     // Queue name. Defaults to process id
     durable: options.durable || false                // Queue durability. Defaults to false
   };
 
@@ -27,7 +28,7 @@ function AMQPClient(options, callback) {
 
   debug(constants.CONNECTING);
 
-  // Connect to AMQP
+  // Connect to AMQP broker
   amqp.connect(self.options.uri, function (err, connection) {
 
     if (err) {
@@ -51,7 +52,7 @@ function AMQPClient(options, callback) {
         throw error;
       }
 
-      // SAves reference of channel for future use
+      // Saves reference of channel for future use
       self.channel = channel;
 
       // Create an exchange if it doesn't exists
@@ -63,14 +64,14 @@ function AMQPClient(options, callback) {
       debug(constants.INITIALIZED);
 
       if (callback) {
-        return callback();
+        return callback(null, self);
       }
     });
   });
 }
 
 /**
- * Publishes message to AMQP exchange
+ * Publishes message for any client interested to subscribe and listen to.
  * @param {string} type - Type of the message
  * @param {*} data - Data to be sent
  * @param {function} [callback] - Callback
@@ -102,7 +103,7 @@ AMQPClient.prototype.emit = function (type, data, callback) {
 };
 
 /**
- * Listens for message of a type
+ * Registers a listener for messages of a particular type.
  * @param {string} type - Type of the message
  * @param {messageReceivedCallback} callback - Callback
  */
