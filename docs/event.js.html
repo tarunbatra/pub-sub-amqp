@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Home - Documentation</title>
+    <title>event.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,56 +27,60 @@
 
 <div id="main">
     
+    <h1 class="page-title">event.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Creates an event object with received message
+ * @class Event
+ * @author tbking &lt;tarun.batra00@gmail.com>
+ */
+var Event = function (self, msg) {
 
+  /**
+   * Data received in the message
+   * @member Event#data
+   */
+  this.data;
 
+  try {
+    // Try to parse the message received
+    this.data = JSON.parse(msg.content.toString());
+  } catch (err) {
 
+    // If message is not valid JSON,
+    // return the message as it is
+    this.data = msg.content.toString();
+  }
 
+  /**
+   * Method to acknowledge the message
+   * @function Event#ack
+   */
+  this.ack = function () {
+    self.channel.ack(msg);
+  };
 
+  /**
+   * Method to reject the message
+   * @function Event#reject
+   */
+  this.reject = function () {
+    self.channel.reject(msg);
+  };
+};
 
-
-
-
-    
-
-
-    <section class="readme">
-        <article><h1>pub-sub-amqp</h1><p>An easy to use, no frills module allowing inter-process publish/subscribe communication over <a href="https://www.rabbitmq.com/">RabbitMQ</a>.</p>
-<h2>Installation</h2><p><code>npm install pub-sub-amqp</code></p>
-<h2>Usage</h2><pre class="prettyprint source"><code>
-var amqpClient = require('pub-sub-amqp');
-
-// Initialize the connection with RabbitMQ broker
-new amqpClient({
-  uri: 'amqp://localhost'
-  }, function (err, eventManagar) {
-
-    // Register a listener for 'ready' event
-    eventManagar.on('ready', function (err, event) {
-
-      console.log(event.data); // -> { some: 'data' }
-
-      event.ack(); // Acknowledge the message
-    });
-
-    // Emit a 'ready' event
-    eventManagar.emit('ready', { some: 'data' }, function (err) {
-
-      // Do something after publishing message
-    });
-});</code></pre><h2>API</h2><ul>
-<li><a href="https://tarunbatra.github.io/pub-sub-amqp/AMQPClient.html">API Reference</a></li>
-</ul>
-<h2>Test</h2><p><code>npm test</code></p>
-<h2>License</h2><p>MIT</p></article>
+module.exports = Event;
+</code></pre>
+        </article>
     </section>
-
-
 
 
 

@@ -150,7 +150,7 @@ module.exports = AMQPClient;
  * Callback called when a subscribed message is received
  * @callback messageReceivedCallback
  * @param {object|null} error - Error
- * @param {event} event - Event object containing message details
+ * @param {Event} event - Event object containing message details
  * @param {object} event.data - Data received in the message
  * @param {object} event.ack - Method to acknowledge the message
  * @param {object} event.reject - Method to reject the message

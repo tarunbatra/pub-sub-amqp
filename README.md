@@ -16,19 +16,22 @@ new amqpClient({
 
     // Register a listener for 'ready' event
     eventManagar.on('ready', function (err, event) {
-      console.log(event.data) // -> { some: 'data' }
+
+      console.log(event.data); // -> { some: 'data' }
+
       event.ack(); // Acknowledge the message
     });
 
     // Emit a 'ready' event
     eventManagar.emit('ready', { some: 'data' }, function (err) {
+
       // Do something after publishing message
     });
 });
 ```
 
 ## API
-- [API Reference](./AMQPClient.html)
+- [API Reference](https://tarunbatra.github.io/pub-sub-amqp/AMQPClient.html)
 
 ## Test
 `npm test`
