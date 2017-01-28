@@ -1,6 +1,7 @@
 var amqp = require('amqplib/callback_api');
 var debug = require('debug')('pub-sub-amqp');
 var constants = require('./constants.json');
+var Event = require('./event');
 
 /**
  * A wrapper over AMQP, providing methods to publish and subscribe.
@@ -130,26 +131,10 @@ AMQPClient.prototype.on = function (type, callback) {
   // Listen for messages
   self.channel.consume(self.options.queue, function (msg) {
 
-    var data;
+    // Create the event
+    var event = new Event(self, msg);
 
-    try {
-      // Try to parse the message received
-      data = JSON.parse(msg.content.toString());
-    } catch (err) {
-
-      // If message is not valid JSON,
-      // return the message as it is
-      data = msg.content.toString();
-    }
-
-    debug('RECEVIED: [%s] %o', type, data);
-
-    // Construct the event object
-    var event = {
-      data: data,
-      ack: self.channel.ack,
-      reject: self.channel.reject
-    };
+    debug('RECEVIED: [%s] %o', type, event.data);
 
     // Return the event
     if (callback) {
@@ -165,8 +150,8 @@ module.exports = AMQPClient;
  * Callback called when a subscribed message is received
  * @callback messageReceivedCallback
  * @param {object|null} error - Error
- * @param {object} event - Message details
- * @param {object} event.data - Message received
+ * @param {event} event - Event object containing message details
+ * @param {object} event.data - Data received in the message
  * @param {object} event.ack - Method to acknowledge the message
  * @param {object} event.reject - Method to reject the message
  */
