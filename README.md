@@ -1,7 +1,10 @@
 # pub-sub-amqp
+
+[![npm version](https://badge.fury.io/js/pub-sub-amqp.svg)](https://www.npmjs.com/package/pub-sub-amqp)
+[![build status](https://travis-ci.org/tarunbatra/pub-sub-amqp.svg?branch=master)](https://travis-ci.org/tarunbatra/pub-sub-amqp)
+
 An easy to use, no frills module allowing inter-process publish/subscribe communication on the top of an AMQP broker like [RabbitMQ](https://www.rabbitmq.com/).
 
-[![build status](travis-image)](travis-url)
 
 ## Installation
 `npm install pub-sub-amqp`
@@ -11,24 +14,13 @@ An easy to use, no frills module allowing inter-process publish/subscribe commun
 
 var amqpClient = require('pub-sub-amqp');
 
-// Initialize the connection with RabbitMQ broker
-new amqpClient({
-  uri: 'amqp://localhost'
-  }, function (err, eventManagar) {
+new amqpClient({ uri: 'amqp://localhost' }, function (err, eventManagar) {
 
-    // Register a listener for 'ready' event
     eventManagar.on('ready', function (err, event) {
-
       console.log(event.data); // -> { some: 'data' }
-
-      event.ack(); // Acknowledge the message
     });
 
-    // Emit a 'ready' event
-    eventManagar.emit('ready', { some: 'data' }, function (err) {
-
-      // Do something after publishing message
-    });
+    eventManagar.emit('ready', { some: 'data' });
 });
 ```
 
@@ -40,6 +32,3 @@ new amqpClient({
 
 ## License
 MIT
-
-[travis-image]: https://travis-ci.org/tarunbatra/pub-sub-amqp.svg?branch=master
-[travis-url]: https://travis-ci.org/tarunbatra/pub-sub-amqp
