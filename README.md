@@ -1,5 +1,7 @@
 # pub-sub-amqp
-An easy to use, no frills module allowing inter-process publish/subscribe communication over [RabbitMQ](https://www.rabbitmq.com/).
+An easy to use, no frills module allowing inter-process publish/subscribe communication on the top of an AMQP broker like [RabbitMQ](https://www.rabbitmq.com/).
+
+[![build status](travis-image)](travis-url)
 
 ## Installation
 `npm install pub-sub-amqp`
@@ -38,3 +40,6 @@ new amqpClient({
 
 ## License
 MIT
+
+[travis-image]: https://travis-ci.org/tarunbatra/pub-sub-amqp.svg?branch=master
+[travis-url]: https://travis-ci.org/tarunbatra/pub-sub-amqp
