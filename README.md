@@ -10,7 +10,7 @@ An easy to use, no frills module allowing inter-process publish/subscribe commun
 `npm install pub-sub-amqp`
 
 ## Usage
-```
+```js
 
 var amqpClient = require('pub-sub-amqp');
 
