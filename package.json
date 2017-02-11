@@ -12,7 +12,9 @@
     "amqp",
     "pub/sub",
     "publish",
+    "subscribe",
     "rabbitmq",
+    "0mq",
     "event"
   ],
   "author": "Tarun Batra <tarun.batra00@gmail.com>",
