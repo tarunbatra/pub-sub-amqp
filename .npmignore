@@ -1,3 +1,4 @@
 docs
 tests
 .eslintrc
+.travis.yml
